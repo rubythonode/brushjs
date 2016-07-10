@@ -27,6 +27,35 @@
 <script type="text/javascript" src="Brush.js"></script>
 <script type="text/javascript">
 var canvas = new Brush('canvas');
-// Your Code
+canvas.Circle(
+  [
+    {
+      id : 'ball1',
+      lineWidth : 1,
+      strokeStyle : 'red',
+      x : 100,
+      y : 100,
+      startAngle : 0,
+      endAngle : Math.PI*2,
+      radius : 20,
+      isFill : true,
+      fillColor : 'red'
+
+    },
+    {
+      id : 'ball2',
+      lineWidth : 1,
+      strokeStyle : 'black',
+      x : 110,
+      y : 110,
+      startAngle : 0,
+      endAngle : Math.PI*2,
+      radius : 40,
+      isFill : true,
+      fillColor : 'yellow',
+      opacity : 0.5
+    }
+  ]
+)
 </script>
 </html>

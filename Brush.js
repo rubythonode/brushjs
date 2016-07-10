@@ -118,6 +118,7 @@ brushProto.drawingFn = {
 		}
 		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
 		_context.arc(option.x , Helper.fixCoordinate(_canvas.height,option.y), option.radius, option.startAngle , option.endAngle,option.dir);
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		if(option.isFill){
 			if(option.fillColor){
 				_context.fillStyle = option.fillColor;
@@ -140,6 +141,7 @@ brushProto.drawingFn = {
 		_context.textAlign = option.textAlign ? option.textAlign : 'center';
 		_context.textBaseline = option.textBaseline ? option.textBaseline : 'middle';
 		_context.fillText(option.text, option.x, Helper.fixCoordinate(_canvas.height, option.y));
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		if(option.strokeStyle){
 			_context.strokeText(option.text, option.x, Helper.fixCoordinate(_canvas.height, option.y))
 		}
@@ -162,7 +164,7 @@ brushProto.drawingFn = {
 		}
 		_context.lineCap = option.lineCap ? option.lineCap : 'butt';
 		_context.lineJoin = option.lineJoin ? option.lineJoin : 'bevel';
-
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		if(option['isClose']){
 			_context.closePath();
 		}
@@ -192,6 +194,7 @@ brushProto.drawingFn = {
 		if(option.strokeStyle){
 			_context.strokeStyle =  option.strokeStyle;
 		}
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		_context.lineCap = option.lineCap ? option.lineCap : 'butt';
 		_context.lineJoin = option.lineJoin ? option.lineJoin : 'bevel';
 
@@ -226,7 +229,7 @@ brushProto.drawingFn = {
 		if(option.strokeStyle){
 			_context.strokeStyle =  option.strokeStyle;
 		}
-
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		if(option['isFill']){
 			_context.fillStyle = option.fillColor;
 			_context.fill();
@@ -253,6 +256,7 @@ brushProto.drawingFn = {
 			_context.closePath();
 		}
 		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		if(option.strokeStyle){
 			_context.strokeStyle =  option.strokeStyle;
 		}
@@ -278,6 +282,7 @@ brushProto.drawingFn = {
 
 		_context.beginPath();
 		_context.moveTo(startX , Helper.fixCoordinate(_canvas.height, startY) );
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		for(var step =0; step <= index; step++){
 			_context.lineTo(points[step][0] , Helper.fixCoordinate(_canvas.height, points[step][1])  );
 		}

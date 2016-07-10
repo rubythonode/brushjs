@@ -1,6 +1,9 @@
 #Brushjs
----
+
+
 버전 : beta-0.0.1
+
+
 
 #시작하기
 
@@ -95,7 +98,8 @@ canvas.Line(
       lineJoin : 라인간의 연결 형태, //miter , round, bevel
       isClose : 끝점과 시작점 연결 유무 (bool),
       isFill : isClose 가 true인 경우에 내부 색 채움 (bool),
-      fillColor : isFill 이 true인 경우 내부 색 (string)
+      fillColor : isFill 이 true인 경우 내부 색 (string),
+      opacity : 투명도 (0 < opacity < 1)
     }
   ]
 );
@@ -119,7 +123,8 @@ canvas.Line(
       lineJoin : 'round', //miter , round, bevel
       isClose : false,
       isFill : true,
-      fillColor : 'green'
+      fillColor : 'green',
+      opacity : 0.5
     }
   ]
 );
@@ -143,7 +148,8 @@ canvas.Circle(
       endAngle : 종료 각 (int),
       radius : 반지름(int),
       isFill : 내부 색 채움(bool),
-      fillColor : isFill이  true인 경우 내부 색(string)
+      fillColor : isFill이  true인 경우 내부 색(string),
+      opacity : 투명도 (0 < opacity < 1)
     }
   ]
 )
@@ -198,7 +204,8 @@ canvas.Text(
       textAlign : 텍스트 정렬,
       textBaseline : 텍스트 베이스 라인 형태,
       x : x좌표(int),
-      y : y좌표(int)
+      y : y좌표(int),
+      opacity : 투명도 (0 < opacity < 1)
     }
   ]
 )
@@ -254,7 +261,8 @@ canvas.BezierCurve(
       strokeStyle : 폰트 라인 색 (string),
       isClose : 끝점과 시작점 연결 유무 (bool),
       isFill : isClose 가 true인 경우에 내부 색 채움 (bool),
-      fillColor : isFill 이 true인 경우 내부 색 (string)
+      fillColor : isFill 이 true인 경우 내부 색 (string),
+      opacity : 투명도 (0 < opacity < 1)
     }
   ]
 )
@@ -322,7 +330,8 @@ canvas.QuadraticCurve(
       lineWidth : 폰트 라인 두깨(string),
       strokeStyle : 폰트 라인 색 (string),
       lineCap : 라인의 끝 마무리 형태,
-      isFill : isClose 가 true인 경우에 내부 색 채움 (bool)
+      isFill : isClose 가 true인 경우에 내부 색 채움 (bool),
+      opacity : 투명도 (0 < opacity < 1)
     }
   ]
 );
@@ -370,7 +379,8 @@ canvas.ArcTo(
       lineJoin : 라인간의 연결 형태, //miter , round, bevel
       isClose : 끝점과 시작점 연결 유무 (bool),
       isFill : isClose 가 true인 경우에 내부 색 채움 (bool),
-      fillColor : isFill 이 true인 경우 내부 색 (string)
+      fillColor : isFill 이 true인 경우 내부 색 (string),
+      opacity : 투명도 (0 < opacity < 1)
     }
   ]
 );
@@ -661,3 +671,17 @@ canvas.Animation([
 ])
 
 ```
+
+---
+#What Next
+
+1. StrokeRect
+2. Gradient
+3. Shadow
+4. Blur
+5. Scale(animation)
+6. Rotate(animation)
+7. Image
+
+
+
