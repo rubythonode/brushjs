@@ -26,36 +26,27 @@
 </body>
 <script type="text/javascript" src="Brush.js"></script>
 <script type="text/javascript">
-var canvas = new Brush('canvas');
-canvas.Circle(
-  [
-    {
-      id : 'ball1',
-      lineWidth : 1,
-      strokeStyle : 'red',
-      x : 100,
-      y : 100,
-      startAngle : 0,
-      endAngle : Math.PI*2,
-      radius : 20,
-      isFill : true,
-      fillColor : 'red'
-
-    },
-    {
-      id : 'ball2',
-      lineWidth : 1,
-      strokeStyle : 'black',
-      x : 110,
-      y : 110,
-      startAngle : 0,
-      endAngle : Math.PI*2,
-      radius : 40,
-      isFill : true,
-      fillColor : 'yellow',
-      opacity : 0.5
-    }
-  ]
-)
+var canvas = new Brush('canvas')
+canvas.Stroke([
+  {
+    id: 'stroke',
+    points: [
+      [0, 100],
+      [100, 150],
+      [300, 70],
+      [400, 180],
+      [500, 100],
+      [600, 40]
+    ]
+  }
+]);
+canvas.Animation([
+  {
+    id: 'stroke',
+    type: 'stroking',
+    speed: 1,
+    time: 1
+  }
+])
 </script>
 </html>

@@ -428,8 +428,7 @@ layer가 아래로 떨어지는 효과
 {
    id : 효과를 줄 대상 레이어 고유 ID,
    type : 'falling',
-   speedX : 좌측 이동 속도,
-   speedY : 우측 이동 속도
+   speed : 이동 속도
  }
 
 ```
@@ -459,8 +458,7 @@ for(var i=0; i < 10; i++){
     var fallingAnimation = {
        id : 'ball' +i,
        type : 'falling',
-       speedX : Math.floor(Math.random() * 5) + 1,
-       speedY : Math.floor(Math.random() * 2) + 1
+       speed : Math.floor(Math.random() * 2) + 1
      }
      animation.push(fallingAnimation)
 
@@ -480,8 +478,7 @@ layer가 위로 올라가는 효과
 {
    id : 효과를 줄 대상 레이어 고유 ID,
    type : 'rising',
-   speedX : 좌측 이동 속도,
-   speedY : 우측 이동 속도
+   speed : 이동 속도
  }
 
 ```
@@ -510,8 +507,7 @@ for(var i=0; i < 10; i++){
     var fallingAnimation = {
        id : 'ball' +i,
        type : 'rising',
-       speedX : Math.floor(Math.random() * 5) + 1,
-       speedY : Math.floor(Math.random() * 2) + 1
+       speed : Math.floor(Math.random() * 2) + 1
      }
      animation.push(fallingAnimation)
 
@@ -648,6 +644,7 @@ canvas.Animation([
 ####예제
 ```javascript
 
+var canvas = new Brush('canvas')
 canvas.Stroke([
   {
     id: 'stroke',
@@ -685,3 +682,4 @@ canvas.Animation([
 
 
 
+	
