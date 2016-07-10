@@ -13,7 +13,6 @@
   width: 1000px;
   height: 575px;
   margin: 10px auto;
-  /*background: url('bg.jpg');*/
 }
 </style>
 <body>
@@ -27,60 +26,7 @@
 </body>
 <script type="text/javascript" src="Brush.js"></script>
 <script type="text/javascript">
-var canvas = new Brush('canvas')
-canvas.Stroke([
-  {
-    id: 'stroke',
-    points: [
-      [0, 100],
-      [100, 150],
-      [300, 70],
-      [400, 180],
-      [500, 100],
-      [600, 40],
-      [700, 120],
-      [800, 30],
-      [900, 100],
-      [1000,200]
-    ] 
-  }
-]);
-canvas.Animation([
-  {
-    id: 'stroke',
-    type: 'stroking',
-    speed: 1,
-    time: 1
-  }
-])
-var balls = [];
-var animation = [];
-for(var i=0; i < 100; i++){
-  (function(i){
-    var ball = {
-      id : 'ball' +i,
-      lineWidth : 1,
-      strokeStyle :  '#'+Math.floor(Math.random()*16777215).toString(16),
-      x : Math.floor(Math.random() * 990) + 1,
-      y : Math.floor(Math.random() * 800) + 400,
-      startAngle : 0,
-      endAngle : Math.PI*2,
-      radius : Math.floor(Math.random() * 8) + 3,
-      isFill : true,
-      fillColor : '#'+Math.floor(Math.random()*16777215).toString(16)
-    }
-    balls.push(ball);
-    var fallingAnimation = {
-       id : 'ball' +i,
-       type : 'bouncing',
-       speedX : Math.floor(Math.random() * 5) + 1,
-       speedY : Math.floor(Math.random() * 2) + 1
-     }
-     animation.push(fallingAnimation)
-
-  })(i)
-}
-canvas.Circle(balls)
-canvas.Animation(animation)
+var canvas = new Brush('canvas');
+// Your Code
 </script>
 </html>

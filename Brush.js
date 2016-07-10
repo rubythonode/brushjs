@@ -1,4 +1,6 @@
 // Animation
+
+//Code From Paul Irish.
 (function() {
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
@@ -146,11 +148,12 @@ brushProto.drawingFn = {
 		var _canvas = layer['canvas'];
 		var _context = _canvas.context;
 		var option = layer['props'];
-		_context.beginPath();
-		_context.moveTo(option.from[0] , Helper.fixCoordinate(_canvas.height, option.from[1]) );
-
 		var points = option.points;
-		for(var point =0; point < points.length; point++){
+
+		_context.beginPath();
+		_context.moveTo(points[0][0] , Helper.fixCoordinate(_canvas.height, points[0][1]) );
+
+		for(var point =1; point < points.length; point++){
 			_context.lineTo(points[point][0] , Helper.fixCoordinate(_canvas.height, points[point][1]) );
 		}
 		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
@@ -278,7 +281,7 @@ brushProto.drawingFn = {
 		for(var step =0; step <= index; step++){
 			_context.lineTo(points[step][0] , Helper.fixCoordinate(_canvas.height, points[step][1])  );
 		}
-		// 
+		//
 		option['index'] = option['index'] + 1;
 
 		_context.stroke();
@@ -424,7 +427,7 @@ var AnimationType = {
 		var option = animationInfo;
 		layer['props']['x'] = layer['props']['x'] + option['speedX'];
 		layer['props']['y'] = layer['props']['y'] + option['speedY'];
-		
+
 		if(layer['props']['y'] > canvas.height){
 			option['speedY'] = -option['speedY'];
 		}
@@ -449,7 +452,7 @@ var AnimationType = {
 		option['drawPoints'] = drawPoints;
 		var pointsLen = points.length;
 
-		
+
 		for(var pt =0; pt< pointsLen; pt++){
 			(function(){
 				var currentP = points[pt];
@@ -464,7 +467,7 @@ var AnimationType = {
 					for(var rx = currentPX+ speed; rx <= nextPX; rx= rx + speed){
 						stepX = rx;
 						stepY = ((nextPY -currentPY) * (stepX- currentPX) / (nextPX - currentPX) ) + currentPY;
-						
+
 						(function(stepX, stepY){
 							var point = [stepX, stepY];
 							drawPoints.push(point)
