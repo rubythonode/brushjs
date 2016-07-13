@@ -140,14 +140,17 @@ canvas.Circle(
   [
     {
       id : 고유한 ID 값(string),
-      lineWidth : 라인 두께(string),
-      strokeStyle : 라인 칼러(string),
-      x : x좌표(int),
-      y : y좌표(int),
+      points : [
+      		[x1 , y1 , radius1],
+      		...
+      		[x , y , radius]
+      ]
       startAngle : 시작 각 (int),
       endAngle : 종료 각 (int),
       radius : 반지름(int),
       isFill : 내부 색 채움(bool),
+      lineWidth : 라인 두께(string),
+      strokeStyle : 라인 칼러(string),
       fillColor : isFill이  true인 경우 내부 색(string),
       opacity : 투명도 (0 < opacity < 1)
     }
@@ -164,30 +167,61 @@ canvas.Circle(
       id : 'ball1',
       lineWidth : 1,
       strokeStyle : 'red',
-      x : 100,
-      y : 100,
+      points : [
+          [100, 100 , 20],
+          [200, 200 , 20],
+    	],
       startAngle : 0,
       endAngle : Math.PI*2,
       radius : 20,
       isFill : false,
       fillColor : 'red'
-    },
-    {
-      id : 'ball2',
-      lineWidth : 1,
-      strokeStyle : 'black',
-      x : 320,
-      y : 300,
-      startAngle : 0,
-      endAngle : Math.PI*2,
-      radius : 40,
-      isFill : true,
-      fillColor : 'yellow'
     }
   ]
 )
-
 ```
+
+###3. Rectangle
+-
+```javascript
+canvas.Rectangle([
+	{
+		id : 고유한 ID 값(string),
+		points :
+		[
+			[x1, y1, width1, height1],
+			...
+			[x, y, width, height]
+		],
+		isFill : 내부 색 채움(bool),
+		fillColor : isFill이  true인 경우 내부 색(string),
+		opacity : 투명도 (0 < opacity < 1)
+		lineWidth : 라인 두께(string),
+		strokeStyle : 라인 칼러(string),
+		opacity : 1
+	}
+])
+```
+
+#### 예제
+```javascript
+canvas.Rectangle([
+  {
+    id: 'reac1',
+    points :
+      //[110, 110, 100, 100],
+      [
+        [110, 110, 100, 100]
+      ],
+    isFill : false,
+    fillColor : 'red',
+    lineWidth : 1,
+    strokeStyle : 'gray',
+    opacity : 1
+  }
+])
+```
+
 ###3. Text
 -
 
@@ -672,7 +706,7 @@ canvas.Animation([
 ---
 #What Next
 
-1. StrokeRect
+1. Rectangle (updated 2016.07.13)
 2. Gradient
 3. Shadow
 4. Blur
@@ -682,4 +716,3 @@ canvas.Animation([
 
 
 
-	

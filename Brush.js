@@ -35,7 +35,7 @@ var Group = {
 			canvas : canvas,
 			type: type,
 			props : option,
-			propsOrigin : Object.assign({},option),
+			propsOrigin : brushProto.extend(true , {} , option),
 			active : active
 		}
 	},
@@ -106,32 +106,54 @@ brushProto.QuadraticCurve =  function(option){
 	brushProto.init(this , option , 'quadratic')
 	return this;
 }
+brushProto.Rectangle =  function(option){
+	brushProto.init(this , option , 'rectangle')
+	return this;
+}
+
 
 brushProto.drawingFn = {
 	circle: function(layer){
-		var _canvas = layer['canvas'];
-		var _context = _canvas.context;
-		var option = layer['props'];
-		_context.beginPath();
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option['points'];
+
 		if(option.strokeStyle){
 			_context.strokeStyle =  option.strokeStyle;
 		}
 		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-		_context.arc(option.x , Helper.fixCoordinate(_canvas.height,option.y), option.radius, option.startAngle , option.endAngle,option.dir);
 		_context.globalAlpha = option.opacity ? option.opacity : 1;
-		if(option.isFill){
-			if(option.fillColor){
-				_context.fillStyle = option.fillColor;
+
+		points.forEach(function(elem){
+			_context.beginPath();
+			_context.arc(elem[0] , Helper.fixCoordinate(_canvas.height,elem[1]), elem[2], option.startAngle , option.endAngle,option.dir);
+			if(option.isFill){
+				if(option.fillColor){
+					_context.fillStyle = option.fillColor;
+				}
+				_context.fill();
+			}else{
+				_context.stroke();
 			}
-			_context.fill();
-		}else{
-			_context.stroke();
-		}
+		});
+	},
+	rectangle: function(layer){
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option['points'];
+
+		_context.globalAlpha = option.opacity ? option.opacity : 1;
+
+		points.forEach(function(elem){
+			if(option.isFill){
+				_context.fillStyle = option.fillColor;
+				_context.fillRect(elem[0], Helper.fixCoordinate(_canvas.height,elem[1]), elem[2], elem[3]);
+
+			}else{
+				_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
+				_context.strokeStyle =  option.strokeStyle ? option.strokeStyle : '#000';
+				_context.strokeRect(elem[0], Helper.fixCoordinate(_canvas.height,elem[1]), elem[2], elem[3]);
+			}
+		})
 	},
 	text: function(layer){
-		var _canvas = layer['canvas'];
-		var _context = _canvas.context;
-		var option = layer['props'];
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
 		_context.font = option.font ? option.font : '14pt Arial';
 		_context.fillStyle = option.fillStyle ? option.fillStyle : 'black';
 		if(option.strokeStyle){
@@ -147,10 +169,7 @@ brushProto.drawingFn = {
 		}
 	},
 	line: function(layer){
-		var _canvas = layer['canvas'];
-		var _context = _canvas.context;
-		var option = layer['props'];
-		var points = option.points;
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option.points;
 
 		_context.beginPath();
 		_context.moveTo(points[0][0] , Helper.fixCoordinate(_canvas.height, points[0][1]) );
@@ -176,9 +195,7 @@ brushProto.drawingFn = {
 		}
 	},
 	arcto: function(layer){
-		var _canvas = layer['canvas'];
-		var _context = _canvas.context;
-		var option = layer['props'];
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
 		_context.beginPath();
 		_context.moveTo(option.from[0] , Helper.fixCoordinate(_canvas.height, option.from[1]) );
 
@@ -209,9 +226,7 @@ brushProto.drawingFn = {
 		}
 	},
 	bezierCurve: function(layer){
-		var _canvas = layer['canvas'];
-		var _context = _canvas.context;
-		var option = layer['props'];
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
 		_context.beginPath();
 		_context.moveTo(option.from[0] , Helper.fixCoordinate(_canvas.height, option.from[1]) );
 		var points = option.points;
@@ -238,9 +253,7 @@ brushProto.drawingFn = {
 		}
 	},
 	quadraticCurve: function(layer){
-		var _canvas = layer['canvas'];
-		var _context = _canvas.context;
-		var option = layer['props'];
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
 
 		_context.beginPath();
 		_context.moveTo(option.from[0] , Helper.fixCoordinate(_canvas.height, option.from[1]) );
@@ -264,12 +277,7 @@ brushProto.drawingFn = {
 		_context.stroke();
 	},
 	stroke: function(layer){
-		var _canvas = layer['canvas'];
-		var _context = _canvas.context;
-		var option = layer['props'];
-		var points = option['drawPoints'];
-		var pointsLen = points.length;
-		var index = 0;
+		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option['drawPoints'], pointsLen = points.length, index = 0;
 		if(option['index']){
 			index = option['index'];
 		}else{
@@ -329,6 +337,9 @@ function drawing(){
 				case 'quadratic':
 					brushProto.drawingFn.quadraticCurve(_layer);
 					break;
+				case 'rectangle':
+					brushProto.drawingFn.rectangle(_layer);
+					break;
 				case 'stroke':
 					if(arguments[1] === 'animate'){
 						brushProto.drawingFn.stroke(_layer);
@@ -382,9 +393,7 @@ brushProto.Animation = function(info){
 function _Animation(){
 
 	AnimationGroup.get().forEach(function(elm){
-		var _id = elm['id'];
-		var type = elm['type'];
-		var layer = Group.get(_id);
+		var _id = elm['id'], type = elm['type'], layer = Group.get(_id);
 		AnimationType[type](layer, elm);
 
 	})
@@ -396,25 +405,35 @@ function _Animation(){
 
 var AnimationType = {
 	falling: function(layer, animationInfo){
-		var cavnas = layer['canvas'];
-		var option = animationInfo;
-		if(layer['props']['y'] < 0){
-			layer['props'] = brushProto.extend({} , layer['propsOrigin']);
-		}
-		layer['props']['y'] = layer['props']['y'] - option['speed'];
-
+		var cavnas = layer['canvas'], option = animationInfo;
+		var points = layer['props']['points'];
+		var pointsLen = points.length;
+		points.forEach(function(elem){
+			if(elem[1] < 0){
+				pointsLen--;
+				if(pointsLen === 0){
+					layer['props'] = brushProto.extend(true , {} , layer['propsOrigin']);
+				}
+			}
+			elem[1] = elem[1] - option['speed'];
+		})
 	},
 	rising: function(layer, animationInfo){
-		var cavnas = layer['canvas'];
-		var option = animationInfo;
-		if(layer['props']['y'] > cavnas.height){
-			layer['props'] = brushProto.extend({} , layer['propsOrigin']);
-		}
-		layer['props']['y'] = layer['props']['y'] + option['speed']
+		var cavnas = layer['canvas'], option = animationInfo;
+		var points = layer['props']['points'];
+		var pointsLen = points.length;
+		points.forEach(function(elem){
+			if(elem[1] > canvas.height){
+				pointsLen--;
+				if(pointsLen === 0){
+					layer['props'] = brushProto.extend(true , {} , layer['propsOrigin']);
+				}
+			}
+			elem[1] = elem[1] + option['speed'];
+		})
 	},
 	blowing: function(layer, animationInfo){
-		var cavnas = layer['canvas'];
-		var option = animationInfo;
+		var cavnas = layer['canvas'], option = animationInfo;
 		var originX = layer['propsOrigin']['x'];
 		if(layer['props']['y'] < 0){
 			layer['props'] = brushProto.extend({} , layer['propsOrigin']);
@@ -428,8 +447,7 @@ var AnimationType = {
 		}
 	},
 	bouncing: function(layer, animationInfo){
-		var cavnas = layer['canvas'];
-		var option = animationInfo;
+		var cavnas = layer['canvas'], option = animationInfo;
 		layer['props']['x'] = layer['props']['x'] + option['speedX'];
 		layer['props']['y'] = layer['props']['y'] + option['speedY'];
 
@@ -450,24 +468,16 @@ var AnimationType = {
 		}
 	},
 	stroking: function(layer, animationInfo){
-		var option = layer['props'];
-		var points = option['points'];
-		var speed = animationInfo['speed'];
-		var drawPoints = [];
+		var option = layer['props'], points = option['points'], speed = animationInfo['speed'], drawPoints = [];
 		option['drawPoints'] = drawPoints;
 		var pointsLen = points.length;
 
 
 		for(var pt =0; pt< pointsLen; pt++){
 			(function(){
-				var currentP = points[pt];
-				var nextP = points[pt + 1];
+				var currentP = points[pt], nextP = points[pt + 1];
 				if(nextP){
-					var currentPX = currentP[0];
-					var currentPY = currentP[1];
-					var nextPX = nextP[0];
-					var nextPY = nextP[1];
-					var stepX, stepY, rangeX;
+					var currentPX = currentP[0], currentPY = currentP[1], nextPX = nextP[0], nextPY = nextP[1], stepX, stepY, rangeX;
 
 					for(var rx = currentPX+ speed; rx <= nextPX; rx= rx + speed){
 						stepX = rx;
