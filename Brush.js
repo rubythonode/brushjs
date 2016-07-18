@@ -1,5 +1,3 @@
-// Animation
-
 //Code From Paul Irish.
 (function() {
     var lastTime = 0;
@@ -31,6 +29,8 @@
 var Group = {
 	layers : {},
 	_set : function(layerName, canvas, option , type , active){
+		option['width'] = canvas.width;
+		option['height'] = canvas.height;
 		this.layers[layerName] = {
 			canvas : canvas,
 			type: type,
@@ -113,15 +113,55 @@ brushProto.Rectangle =  function(option){
 
 
 brushProto.drawingFn = {
-	circle: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option['points'];
+	commonDrawing: function(context, option){
+		var _fillStyle = option.fillStyle ? option.fillStyle : '#000';
+		context.strokeStyle =  option.strokeStyle ? option.strokeStyle : '#000';
+		context.lineWidth = option.lineWidth ? option.lineWidth : 1;
+		context.globalAlpha = option.opacity ? option.opacity : 1;
+		context.lineCap = option.lineCap ? option.lineCap : 'butt';
+		context.lineJoin = option.lineJoin ? option.lineJoin : 'bevel';
 
-		if(option.strokeStyle){
-			_context.strokeStyle =  option.strokeStyle;
+		context.shadowColor = null;
+		context.shadowBlur = null;
+		context.shadowOffsetX = null;
+		context.shadowOffsetY = null;
+
+		if(option.gradient){
+			var grad;
+			var gradient = option['gradient'],
+			start = gradient['start'],
+			end = gradient['end'],
+			colorPosition = gradient['colorPosition']
+			if(gradient['type'] === 'linear'){
+				grad = context.createLinearGradient(start[0], Helper.fixCoordinate(option.height,start[1]), end[0], Helper.fixCoordinate(option.height,end[1]));
+			}else{
+				grad = context.createRadialGradient(start[0], Helper.fixCoordinate(option.height,start[1]), start[2] ,end[0], Helper.fixCoordinate(option.height,end[1]), end[2]);
+			}
+			colorPosition.forEach(function(elem){
+      	grad.addColorStop(elem[0],elem[1]);
+      })
+			_fillStyle = grad;
+			context.strokeStyle = grad;
 		}
-		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
 
+		if(option.shadow){
+			var shadow = option['shadow'];
+			context.shadowColor = shadow['color'];
+			context.shadowBlur = shadow['blur'];
+			context.shadowOffsetX = shadow['offsetX'];
+			context.shadowOffsetY = -shadow['offsetY'];
+		}
+
+
+		context.fillStyle = _fillStyle;
+	},
+	circle: function(layer){
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'],
+		points = option['points'];
+
+		this.commonDrawing(_context , option);
 		points.forEach(function(elem){
 			_context.beginPath();
 			_context.arc(elem[0] , Helper.fixCoordinate(_canvas.height,elem[1]), elem[2], option.startAngle , option.endAngle,option.dir);
@@ -136,66 +176,66 @@ brushProto.drawingFn = {
 		});
 	},
 	rectangle: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option['points'];
-
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
-
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'],
+		points = option['points'];
+		this.commonDrawing(_context , option);
 		points.forEach(function(elem){
 			if(option.isFill){
-				_context.fillStyle = option.fillColor;
-				_context.fillRect(elem[0], Helper.fixCoordinate(_canvas.height,elem[1]), elem[2], elem[3]);
-
+				_context.fillRect(elem[0], Helper.fixCoordinate(_canvas.height,elem[1] + elem[3]), elem[2], elem[3]);
 			}else{
-				_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-				_context.strokeStyle =  option.strokeStyle ? option.strokeStyle : '#000';
-				_context.strokeRect(elem[0], Helper.fixCoordinate(_canvas.height,elem[1]), elem[2], elem[3]);
+				_context.strokeRect(elem[0], Helper.fixCoordinate(_canvas.height,elem[1] + elem[3]), elem[2], elem[3]);
 			}
 		})
 	},
 	text: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'],
+		points = option.points;
+
 		_context.font = option.font ? option.font : '14pt Arial';
-		_context.fillStyle = option.fillStyle ? option.fillStyle : 'black';
-		if(option.strokeStyle){
-			_context.strokeStyle =  option.strokeStyle;
-		}
-		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
 		_context.textAlign = option.textAlign ? option.textAlign : 'center';
 		_context.textBaseline = option.textBaseline ? option.textBaseline : 'middle';
-		_context.fillText(option.text, option.x, Helper.fixCoordinate(_canvas.height, option.y));
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
-		if(option.strokeStyle){
-			_context.strokeText(option.text, option.x, Helper.fixCoordinate(_canvas.height, option.y))
-		}
+		this.commonDrawing(_context , option);
+		points.forEach(function(elem){
+			_context.fillText(option.text, elem[0], Helper.fixCoordinate(_canvas.height, elem[1]));
+			if(option.strokeStyle){
+				_context.strokeText(option.text, elem[0], Helper.fixCoordinate(_canvas.height, elem[1]))
+			}
+		})
+
 	},
 	line: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option.points;
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'],
+		points = option.points,
+		pointsLen = points.length;
 
+		this.commonDrawing(_context , option);
 		_context.beginPath();
 		_context.moveTo(points[0][0] , Helper.fixCoordinate(_canvas.height, points[0][1]) );
 
-		for(var point =1; point < points.length; point++){
-			_context.lineTo(points[point][0] , Helper.fixCoordinate(_canvas.height, points[point][1]) );
+		for(var idx =1; idx < pointsLen; idx++){
+			_context.lineTo(points[idx][0] , Helper.fixCoordinate(_canvas.height, points[idx][1]) );
 		}
-		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-		if(option.strokeStyle){
-			_context.strokeStyle =  option.strokeStyle;
-		}
-		_context.lineCap = option.lineCap ? option.lineCap : 'butt';
-		_context.lineJoin = option.lineJoin ? option.lineJoin : 'bevel';
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		if(option['isClose']){
 			_context.closePath();
 		}
 		if(option['isFill']){
-			_context.fillStyle = option.fillColor;
 			_context.fill();
 		}else{
 			_context.stroke();
 		}
 	},
 	arcto: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'];
+
+		this.commonDrawing(_context , option);
 		_context.beginPath();
 		_context.moveTo(option.from[0] , Helper.fixCoordinate(_canvas.height, option.from[1]) );
 
@@ -207,26 +247,22 @@ brushProto.drawingFn = {
 				points[point][4]
 			);
 		}
-		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-		if(option.strokeStyle){
-			_context.strokeStyle =  option.strokeStyle;
-		}
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
-		_context.lineCap = option.lineCap ? option.lineCap : 'butt';
-		_context.lineJoin = option.lineJoin ? option.lineJoin : 'bevel';
 
 		if(option['isClose']){
 			_context.closePath();
 		}
 		if(option['isFill']){
-			_context.fillStyle = option.fillColor;
 			_context.fill();
 		}else{
 			_context.stroke();
 		}
 	},
 	bezierCurve: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'];
+
+		this.commonDrawing(_context , option);
 		_context.beginPath();
 		_context.moveTo(option.from[0] , Helper.fixCoordinate(_canvas.height, option.from[1]) );
 		var points = option.points;
@@ -240,21 +276,19 @@ brushProto.drawingFn = {
 		if(option.isClose){
 			_context.closePath();
 		}
-		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-		if(option.strokeStyle){
-			_context.strokeStyle =  option.strokeStyle;
-		}
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
+
 		if(option['isFill']){
-			_context.fillStyle = option.fillColor;
 			_context.fill();
 		}else{
 			_context.stroke();
 		}
 	},
 	quadraticCurve: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'];
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'];
 
+		this.commonDrawing(_context , option);
 		_context.beginPath();
 		_context.moveTo(option.from[0] , Helper.fixCoordinate(_canvas.height, option.from[1]) );
 
@@ -268,12 +302,6 @@ brushProto.drawingFn = {
 		if(option.isClose){
 			_context.closePath();
 		}
-		_context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
-		if(option.strokeStyle){
-			_context.strokeStyle =  option.strokeStyle;
-		}
-		_context.lineCap = option.lineCap ? option.lineCap : 'butt'
 		_context.stroke();
 	},
 	stroke: function(layer){
@@ -288,9 +316,9 @@ brushProto.drawingFn = {
 		var startX = option['points'][0][0];
 		var startY = option['points'][0][1];
 
+		this.commonDrawing(_context , option);
 		_context.beginPath();
 		_context.moveTo(startX , Helper.fixCoordinate(_canvas.height, startY) );
-		_context.globalAlpha = option.opacity ? option.opacity : 1;
 		for(var step =0; step <= index; step++){
 			_context.lineTo(points[step][0] , Helper.fixCoordinate(_canvas.height, points[step][1])  );
 		}
@@ -405,9 +433,14 @@ function _Animation(){
 
 var AnimationType = {
 	falling: function(layer, animationInfo){
-		var cavnas = layer['canvas'], option = animationInfo;
-		var points = layer['props']['points'];
-		var pointsLen = points.length;
+
+		var gradient, grdStart, grdEnd
+		cavnas = layer['canvas'],
+		option = animationInfo,
+		points = layer['props']['points'],
+		pointsLen = points.length;
+
+
 		points.forEach(function(elem){
 			if(elem[1] < 0){
 				pointsLen--;
@@ -416,12 +449,29 @@ var AnimationType = {
 				}
 			}
 			elem[1] = elem[1] - option['speed'];
+
+			if(option['dir'] === 'left'){
+				elem[0] = elem[0] - option['speed'];
+			}else if(option['dir'] === 'right'){
+				elem[0] = elem[0] + option['speed'];
+			}
+
+			if(layer['props']['gradient']){
+				gradient = layer['props']['gradient'];
+				grdStart = gradient['start'];
+			 	grdEnd = gradient['end'];
+			 	grdStart[1] =  grdStart[1] - option['speed'];
+			 	grdEnd[1] =  grdEnd[1] - option['speed'];
+			}
 		})
 	},
 	rising: function(layer, animationInfo){
-		var cavnas = layer['canvas'], option = animationInfo;
-		var points = layer['props']['points'];
-		var pointsLen = points.length;
+		var gradient, grdStart, grdEnd
+		cavnas = layer['canvas'],
+		option = animationInfo,
+		points = layer['props']['points'],
+		pointsLen = points.length;
+
 		points.forEach(function(elem){
 			if(elem[1] > canvas.height){
 				pointsLen--;
@@ -430,42 +480,84 @@ var AnimationType = {
 				}
 			}
 			elem[1] = elem[1] + option['speed'];
+
+			if(option['dir'] === 'left'){
+				elem[0] = elem[0] - option['speed'];
+			}else if(option['dir'] === 'right'){
+				elem[0] = elem[0] + option['speed'];
+			}
+			if(layer['props']['gradient']){
+				gradient = layer['props']['gradient'];
+				grdStart = gradient['start'];
+			 	grdEnd = gradient['end'];
+			 	grdStart[1] =  grdStart[1] + option['speed'];
+			 	grdEnd[1] =  grdEnd[1] + option['speed'];
+			}
 		})
 	},
-	blowing: function(layer, animationInfo){
-		var cavnas = layer['canvas'], option = animationInfo;
-		var originX = layer['propsOrigin']['x'];
-		if(layer['props']['y'] < 0){
-			layer['props'] = brushProto.extend({} , layer['propsOrigin']);
-		}
+	// blowing: function(layer, animationInfo){
+	// 	var gradient, grdStart, grdEnd
+	// 	cavnas = layer['canvas'],
+	// 	option = animationInfo,
+	// 	points = layer['props']['points'],
+	// 	pointsLen = points.length;
 
-		layer['props']['y'] = layer['props']['y'] - option['speed'];
-		if(option['dir'] === 'left'){
-			layer['props']['x'] = layer['props']['x'] - 1;
-		}else{
-			layer['props']['x'] = layer['props']['x'] + 1;
-		}
-	},
+	// 	points.forEach(function(elem){
+	// 		if(elem[1] < 0){
+	// 			pointsLen--;
+	// 			if(pointsLen === 0){
+	// 				layer['props'] = brushProto.extend(true , {} , layer['propsOrigin']);
+	// 			}
+	// 		}
+	// 		elem[1] = elem[1] - option['speed'];
+
+	// 		if(layer['props']['gradient']){
+	// 			gradient = layer['props']['gradient'];
+	// 			grdStart = gradient['start'];
+	// 		 	grdEnd = gradient['end'];
+	// 		 	grdStart[1] =  grdStart[1] - option['speed'];
+	// 		 	grdEnd[1] =  grdEnd[1] - option['speed'];
+	// 		}
+	// 	})
+	// },
 	bouncing: function(layer, animationInfo){
-		var cavnas = layer['canvas'], option = animationInfo;
-		layer['props']['x'] = layer['props']['x'] + option['speedX'];
-		layer['props']['y'] = layer['props']['y'] + option['speedY'];
+		var gradient, grdStart, grdEnd
+		cavnas = layer['canvas'],
+		option = animationInfo,
+		points = layer['props']['points'],
+		pointsLen = points.length;
 
-		if(layer['props']['y'] > canvas.height){
-			option['speedY'] = -option['speedY'];
-		}
+		points.forEach(function(elem){
+			elem[0] = elem[0] + option['speedX'];
+			elem[1] = elem[1] + option['speedY'];
 
-		if(layer['props']['y'] < 0 ){
-			option['speedY'] = -option['speedY'];
-		}
+			if(layer['props']['gradient']){
+				gradient = layer['props']['gradient'];
+				grdStart = gradient['start'];
+			 	grdEnd = gradient['end'];
+			 	grdStart[0] = grdStart[0] + option['speedX'];
+			 	grdStart[1] = grdStart[1] + option['speedY'];
 
-		if(layer['props']['x'] < 0 ){
-			option['speedX'] = -option['speedX'];
-		}
+			 	grdEnd[0] = grdEnd[0] + option['speedX'];
+			 	grdEnd[1] = grdEnd[1] + option['speedY'];
 
-		if(layer['props']['x'] > canvas.width ){
-			option['speedX'] = -option['speedX'];
-		}
+			}
+			if(elem[1] > canvas.height){
+				option['speedY'] = -option['speedY'];
+			}
+
+			if(elem[1] < 0 ){
+				option['speedY'] = -option['speedY'];
+			}
+
+			if(elem[0] < 0 ){
+				option['speedX'] = -option['speedX'];
+			}
+
+			if(elem[0] > canvas.width ){
+				option['speedX'] = -option['speedX'];
+			}
+		})
 	},
 	stroking: function(layer, animationInfo){
 		var option = layer['props'], points = option['points'], speed = animationInfo['speed'], drawPoints = [];
@@ -501,62 +593,43 @@ var AnimationType = {
 
 // Code from jQuery
 brushProto.extend = function(){
-
 	var options, name, src, copy, copyIsArray, clone,
 		target = arguments[ 0 ] || {},
 		i = 1,
 		length = arguments.length,
 		deep = false;
-
 	if ( typeof target === "boolean" ) {
 		deep = target;
-
 		target = arguments[ i ] || {};
 		i++;
 	}
 
 	if ( typeof target !== "object" && !Helper.isFunction( target ) ) {
-
 		target = {};
 	}
 
-	// Extend jQuery itself if only one argument is passed
 	if ( i === length ) {
 		target = this;
 		i--;
 	}
 
 	for ( ; i < length; i++ ) {
-
-		// Only deal with non-null/undefined values
 		if ( ( options = arguments[ i ] ) != null ) {
-
-			// Extend the base object
 			for ( name in options ) {
 				src = target[ name ];
 				copy = options[ name ];
-
-				// Prevent never-ending loop
 				if ( target === copy ) {
 					continue;
 				}
-
-				// Recurse if we're merging plain objects or arrays
 				if ( deep && copy && ( Helper.isPlainObject( copy ) ||
 					( copyIsArray = Helper.isArray( copy ) ) ) ) {
-
 					if ( copyIsArray ) {
 						copyIsArray = false;
 						clone = src && Helper.isArray( src ) ? src : [];
-
 					} else {
 						clone = src && Helper.isPlainObject( src ) ? src : {};
 					}
-
-					// Never move original objects, clone them
 					target[ name ] = brushProto.extend( deep, clone, copy );
-
-				// Don't bring in undefined values
 				} else if ( copy !== undefined ) {
 					target[ name ] = copy;
 				}

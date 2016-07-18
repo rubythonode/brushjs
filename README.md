@@ -1,4 +1,4 @@
-#Brushjs
+#Brushjs 
 
 
 버전 : beta-0.0.1
@@ -61,18 +61,22 @@ var canvas = new Brush('canvas');
 
 1. Line
 2. Circle
-3. Text
-4. Cubic Bézier curve(BezierCurve)
-5. Quadratic Bézier curve(QuadraticCurve)
-6. ArcTo
+3. Rectangle
+4. Text
+5. Cubic Bézier curve(BezierCurve)
+6. Quadratic Bézier curve(QuadraticCurve)
+7. ArcTo
 
 **Animation**
 
 1. falling
 2. rising
-3. blowing
-4. bouncing
-5. stroking
+3. bouncing
+4. stroking
+
+**Effect**
+
+1. Gradient
 
 <br/>
 ##1.기본 그래픽 (Non-Animation)
@@ -98,7 +102,7 @@ canvas.Line(
       lineJoin : 라인간의 연결 형태, //miter , round, bevel
       isClose : 끝점과 시작점 연결 유무 (bool),
       isFill : isClose 가 true인 경우에 내부 색 채움 (bool),
-      fillColor : isFill 이 true인 경우 내부 색 (string),
+      fillStyle : isFill 이 true인 경우 내부 색 (string),
       opacity : 투명도 (0 < opacity < 1)
     }
   ]
@@ -123,7 +127,7 @@ canvas.Line(
       lineJoin : 'round', //miter , round, bevel
       isClose : false,
       isFill : true,
-      fillColor : 'green',
+      fillStyle : 'green',
       opacity : 0.5
     }
   ]
@@ -148,10 +152,10 @@ canvas.Circle(
       startAngle : 시작 각 (int),
       endAngle : 종료 각 (int),
       radius : 반지름(int),
-      isFill : 내부 색 채움(bool),
       lineWidth : 라인 두께(string),
       strokeStyle : 라인 칼러(string),
-      fillColor : isFill이  true인 경우 내부 색(string),
+      isFill : 내부 색 채움(bool),
+      fillStyle : isFill이  true인 경우 내부 색(string),
       opacity : 투명도 (0 < opacity < 1)
     }
   ]
@@ -175,7 +179,7 @@ canvas.Circle(
       endAngle : Math.PI*2,
       radius : 20,
       isFill : false,
-      fillColor : 'red'
+      fillStyle : 'red'
     }
   ]
 )
@@ -193,12 +197,11 @@ canvas.Rectangle([
 			...
 			[x, y, width, height]
 		],
-		isFill : 내부 색 채움(bool),
-		fillColor : isFill이  true인 경우 내부 색(string),
-		opacity : 투명도 (0 < opacity < 1)
 		lineWidth : 라인 두께(string),
 		strokeStyle : 라인 칼러(string),
-		opacity : 1
+		isFill : 내부 색 채움(bool),
+		fillStyle : isFill이  true인 경우 내부 색(string),
+		opacity : 투명도 (0 < opacity < 1)
 	}
 ])
 ```
@@ -209,20 +212,19 @@ canvas.Rectangle([
   {
     id: 'reac1',
     points :
-      //[110, 110, 100, 100],
       [
         [110, 110, 100, 100]
       ],
-    isFill : false,
-    fillColor : 'red',
     lineWidth : 1,
     strokeStyle : 'gray',
+    isFill : false,
+    fillStyle : 'red',
     opacity : 1
   }
 ])
 ```
 
-###3. Text
+###4. Text
 -
 
 ```javascript
@@ -230,15 +232,17 @@ canvas.Text(
   [
     {
       id : 고유한 ID 값(string),
+      points : [
+      		[x , y],
+      		...
+    	],
+      text : 텍스트 (string),
       font : 폰트 속성 (string),
+      textAlign : 텍스트 정렬,
+      textBaseline : 텍스트 베이스 라인 형태,
       fillStyle : 폰트 색 (string),
       lineWidth : 폰트 라인 두깨(string),
       strokeStyle : 폰트 라인 색 (string),
-      text : 텍스트 (string),
-      textAlign : 텍스트 정렬,
-      textBaseline : 텍스트 베이스 라인 형태,
-      x : x좌표(int),
-      y : y좌표(int),
       opacity : 투명도 (0 < opacity < 1)
     }
   ]
@@ -252,33 +256,22 @@ canvas.Text(
   [
     {
       id : 'text1',
-      font : '38pt Arial',
-      fillStyle : 'cornflowerblue',
-      lineWidth : 3,
-      strokeStyle : 'blue',
+      points : [
+      	[200 , 50]
+      ],
       text : 'Hello World',
+      font : '38pt Arial',
       textAlign : 'center',
       textBaseline : 'middle',
-      x : 200,
-      y : 50
-    },
-    {
-      id : 'text2',
-      font : '38pt Arial',
       fillStyle : 'cornflowerblue',
       lineWidth : 3,
-      strokeStyle : 'blue',
-      text : 'Hello World!!!!',
-      textAlign : 'left',
-      textBaseline : 'middle',
-      x : 200,
-      y : 150
+      strokeStyle : 'blue'
     }
   ]
 )
 ```
 
-### 4. Cubic Bézier curve(BezierCurve)
+### 5. Cubic Bézier curve(BezierCurve)
 -
 
 ```javascript
@@ -295,7 +288,7 @@ canvas.BezierCurve(
       strokeStyle : 폰트 라인 색 (string),
       isClose : 끝점과 시작점 연결 유무 (bool),
       isFill : isClose 가 true인 경우에 내부 색 채움 (bool),
-      fillColor : isFill 이 true인 경우 내부 색 (string),
+      fillStyle : isFill 이 true인 경우 내부 색 (string),
       opacity : 투명도 (0 < opacity < 1)
     }
   ]
@@ -319,7 +312,7 @@ canvas.BezierCurve(
       strokeStyle : 'red',
       isClose : false,
       isFill : true,
-      fillColor : 'red'
+      fillStyle : 'red'
     }
   ]
 )
@@ -343,7 +336,7 @@ canvas.BezierCurve(
       strokeStyle : 'red',
       isClose : false,
       isFill : true,
-      fillColor : 'red'
+      fillStyle : 'red'
     }
   ]
 )
@@ -380,9 +373,9 @@ canvas.QuadraticCurve(
   [
     {
       id : 'quadratic',
-      from : [x, y],
+      from : [20, 20],
       points : [
-        [90, 100, 200, 20]
+        [20, 100, 200, 20]
       ],
       lineWidth : 10,
       strokeStyle : 'blue',
@@ -393,7 +386,7 @@ canvas.QuadraticCurve(
 );
 ````
 
-### 6. ArcTo
+### 7. ArcTo
 -
 
 ![arcTo](http://www.w3schools.com/tags/img_canvas_arcto.png)
@@ -413,7 +406,7 @@ canvas.ArcTo(
       lineJoin : 라인간의 연결 형태, //miter , round, bevel
       isClose : 끝점과 시작점 연결 유무 (bool),
       isFill : isClose 가 true인 경우에 내부 색 채움 (bool),
-      fillColor : isFill 이 true인 경우 내부 색 (string),
+      fillStyle : isFill 이 true인 경우 내부 색 (string),
       opacity : 투명도 (0 < opacity < 1)
     }
   ]
@@ -437,7 +430,7 @@ canvas.ArcTo(
       lineJoin : 'round', //miter , round, bevel
       isClose : false,
       isFill : false,
-      fillColor : 'green'
+      fillStyle : 'green'
     }
   ]
 );
@@ -462,7 +455,8 @@ layer가 아래로 떨어지는 효과
 {
    id : 효과를 줄 대상 레이어 고유 ID,
    type : 'falling',
-   speed : 이동 속도
+   speed : 이동 속도 ,
+   dir : 떨어지는 방향 // left or right
  }
 
 ```
@@ -471,28 +465,32 @@ layer가 아래로 떨어지는 효과
 랜덤하게 생성된 10 개의 공이 떨어지는 애니메이션
 
 ```javascript
-var canvas = new Brush('canvas')
 var balls = [];
 var animation = [];
-for(var i=0; i < 10; i++){
+for(var i=0; i < 100; i++){
   (function(i){
     var ball = {
       id : 'ball' +i,
       lineWidth : 1,
       strokeStyle :  '#'+Math.floor(Math.random()*16777215).toString(16),
-      x : Math.floor(Math.random() * 600) + 1,
-      y : Math.floor(Math.random() * 300) + 100,
+      points : [
+        [
+          Math.floor(Math.random() * 600) + 1,
+          Math.floor(Math.random() * 600) + 1,
+          Math.floor(Math.random() * 5) + 2
+        ]
+      ],
       startAngle : 0,
       endAngle : Math.PI*2,
-      radius : Math.floor(Math.random() * 8) + 3,
       isFill : true,
-      fillColor : '#'+Math.floor(Math.random()*16777215).toString(16)
+      fillStyle : '#'+Math.floor(Math.random()*16777215).toString(16)
     }
     balls.push(ball);
     var fallingAnimation = {
        id : 'ball' +i,
        type : 'falling',
-       speed : Math.floor(Math.random() * 2) + 1
+       speed: Math.floor(Math.random() * 2) + 1,
+       dir : 'left'
      }
      animation.push(fallingAnimation)
 
@@ -512,7 +510,8 @@ layer가 위로 올라가는 효과
 {
    id : 효과를 줄 대상 레이어 고유 ID,
    type : 'rising',
-   speed : 이동 속도
+   speed : 이동 속도,
+  	dir : 떨어지는 방향 // left or right
  }
 
 ```
@@ -520,54 +519,6 @@ layer가 위로 올라가는 효과
 랜덤하게 생성된 10 개의 공이 위로 올라가는 애니메이션
 
 ```javascript
-var canvas = new Brush('canvas')
-var balls = [];
-var animation = [];
-for(var i=0; i < 10; i++){
-  (function(i){
-    var ball = {
-      id : 'ball' +i,
-      lineWidth : 1,
-      strokeStyle :  '#'+Math.floor(Math.random()*16777215).toString(16),
-      x : Math.floor(Math.random() * 600) + 1,
-      y : Math.floor(Math.random() * 0),
-      startAngle : 0,
-      endAngle : Math.PI*2,
-      radius : Math.floor(Math.random() * 8) + 3,
-      isFill : true,
-      fillColor : '#'+Math.floor(Math.random()*16777215).toString(16)
-    }
-    balls.push(ball);
-    var fallingAnimation = {
-       id : 'ball' +i,
-       type : 'rising',
-       speed : Math.floor(Math.random() * 2) + 1
-     }
-     animation.push(fallingAnimation)
-
-  })(i)
-}
-canvas.Circle(balls)
-canvas.Animation(animation)
-
-```
-###3. blowing
--
-layer가 흩날리는 효과
-
-```javascript
-{
-   id : 효과를 줄 대상 레이어 고유 ID,
-   type : 'rising',
-   speedX : 좌측 이동 속도,
-   speedY : 우측 이동 속도
- }
-
-```
-#### 예제
-
-```javascript
-var canvas = new Brush('canvas')
 var balls = [];
 var animation = [];
 for(var i=0; i < 100; i++){
@@ -576,21 +527,25 @@ for(var i=0; i < 100; i++){
       id : 'ball' +i,
       lineWidth : 1,
       strokeStyle :  '#'+Math.floor(Math.random()*16777215).toString(16),
-      x : Math.floor(Math.random() * 1000) + 1,
-      y : Math.floor(Math.random() * 575) + 500,
+      points : [
+        [
+          Math.floor(Math.random() * 600) + 1,
+          Math.floor(Math.random() * 600) + 1,
+          Math.floor(Math.random() * 5) + 2
+        ]
+      ],
       startAngle : 0,
       endAngle : Math.PI*2,
-      radius : Math.floor(Math.random() * 5) + 2,
       isFill : true,
-      fillColor : '#'+Math.floor(Math.random()*16777215).toString(16)
+      fillStyle : '#'+Math.floor(Math.random()*16777215).toString(16)
     }
     balls.push(ball);
-    var dir = ['left' ,'right'];
     var fallingAnimation = {
        id : 'ball' +i,
-       type : 'blowing',
-       dir : dir[ i % 2],
-       speed: Math.floor(Math.random() * 2) + 1
+       type : 'rising',
+       speed: Math.floor(Math.random() * 2) + 1,
+		dir : 'right'
+
      }
      animation.push(fallingAnimation)
 
@@ -598,11 +553,11 @@ for(var i=0; i < 100; i++){
 }
 canvas.Circle(balls)
 canvas.Animation(animation)
-```
 
-###4. bouncing
+```
+###3. bouncing
 -
-layer가 해당 canvas내에서 부딫혀 튕기는 효과
+layer가 벽에 부딫히는 효과
 
 ```javascript
 {
@@ -616,29 +571,32 @@ layer가 해당 canvas내에서 부딫혀 튕기는 효과
 #### 예제
 
 ```javascript
-var canvas = new Brush('canvas')
 var balls = [];
 var animation = [];
-for(var i=0; i < 10; i++){
+for(var i=0; i < 100; i++){
   (function(i){
     var ball = {
       id : 'ball' +i,
       lineWidth : 1,
       strokeStyle :  '#'+Math.floor(Math.random()*16777215).toString(16),
-      x : Math.floor(Math.random() * 600) + 1,
-      y : Math.floor(Math.random() * 300),
+      points : [
+        [
+          Math.floor(Math.random() * 600) + 1,
+          Math.floor(Math.random() * 600) + 1,
+          Math.floor(Math.random() * 5) + 2
+        ]
+      ],
       startAngle : 0,
       endAngle : Math.PI*2,
-      radius : Math.floor(Math.random() * 8) + 3,
       isFill : true,
-      fillColor : '#'+Math.floor(Math.random()*16777215).toString(16)
+      fillStyle : '#'+Math.floor(Math.random()*16777215).toString(16)
     }
     balls.push(ball);
     var fallingAnimation = {
        id : 'ball' +i,
        type : 'bouncing',
-       speedX : Math.floor(Math.random() * 5) + 1,
-       speedY : Math.floor(Math.random() * 2) + 1
+       speedX: Math.floor(Math.random() * 2) + 1,
+       speedY: Math.floor(Math.random() * 2) + 1
      }
      animation.push(fallingAnimation)
 
@@ -648,7 +606,8 @@ canvas.Circle(balls)
 canvas.Animation(animation)
 ```
 
-###5. stroking
+
+###4. stroking
 -
 주어진 좌표를 따라 선을 긋는 효과
 
@@ -678,7 +637,6 @@ canvas.Animation([
 ####예제
 ```javascript
 
-var canvas = new Brush('canvas')
 canvas.Stroke([
   {
     id: 'stroke',
@@ -689,7 +647,27 @@ canvas.Stroke([
       [400, 180],
       [500, 100],
       [600, 40]
-    ]
+    ],
+    lineWidth : 1,
+    strokeStyle : 'gray',
+    lineCap : 'round',
+    lineJoin : 'round',
+    isClose : false,
+    isFill : false,
+    fillStyle : 'green',
+    opacity : 0.5,
+    gradient : {
+      type : 'linear',
+      start : [0 , 0],
+      end : [600 , 0],
+      colorPosition : [
+        [0 , 'blue'],
+        [0.25 , 'green'],
+        [0.5 , 'black'],
+        [0.75 , 'yellow'],
+        [1 , 'red']
+      ]
+    }
   }
 ]);
 canvas.Animation([
@@ -703,16 +681,205 @@ canvas.Animation([
 
 ```
 
+
+##3.효과 (Effect)
+
+###1. Gradient
+-
+
+#### 1) Linear Gradient
+
+```javascript
+
+gradient : {
+	type : 'linear'
+	start : [start X , start Y], 
+	end : [start X , start Y], 
+	colorPosition : [
+		[position , color], // 0 <= position <= 1
+		...
+	]
+}
+
+```
+####예제
+```javascript
+
+canvas.Rectangle([
+  {
+    id: 'Gradient-Vertical',
+    points :
+      [
+        [50, 50, 100, 100]
+      ],
+    isFill : true,
+    fillStyle : 'red',
+    lineWidth : 1,
+    strokeStyle : 'gray',
+    opacity : 1,
+    gradient : {
+      type : 'linear', 
+      start : [0 , 150], 
+      end : [0 , 50], 
+      colorPosition : [
+        [0 , 'blue'],
+        [0.5 , 'black'],
+        [1 , 'red']
+      ]
+    }
+  }
+])
+canvas.Rectangle([
+  {
+    id: 'Gradient-Horizontal',
+    points :
+      [
+        [150, 150, 100, 100]
+      ],
+    isFill : true,
+    fillStyle : 'red',
+    lineWidth : 1,
+    strokeStyle : 'gray',
+    opacity : 1,
+    gradient : {
+      type : 'linear', 
+      start : [150 , 0],
+      end : [250 , 0], 
+      colorPosition : [
+        [0 , 'blue'],
+        [0.5 , 'black'],
+        [1 , 'red']
+      ]
+    }
+  }
+])
+```
+
+
+
+#### 2) Radial Gradient
+
+```javascript
+gradient : {
+	type : 'radial', 
+	start : [start X , start Y , start Radius],
+	end : [end X , end Y , end Radius], 
+	colorPosition : [
+	  [position , color], // 0 <= position <= 1
+		...
+	]
+}
+```
+####예제
+```javascript
+canvas.Circle(
+  [
+    {
+      id : 'ball1',
+      lineWidth : 1,
+      strokeStyle : 'red',
+      points : [
+          [100, 100 , 20]
+      ],
+      startAngle : 0,
+      endAngle : Math.PI*2,
+      radius : 20,
+      isFill : true,
+      gradient : {
+        type : 'radial', 
+        start : [100 , 100 , 1], 
+        end : [100 , 100 , 20], 
+        colorPosition : [
+          [0 , 'red'],
+          [0.7 , 'pink'],
+          [1 , 'white']
+        ]
+      }
+    }
+  ]
+)
+```
+
+###2. Shadow
+-
+그림자 효과
+
+```javascript
+shadow : {
+	color : 그림자 색,
+	blur : 색 퍼짐의 범위,
+	offsetX : 오른쪽으로 X ( 왼쪽 -X) ,
+	offsetY : 위로  Y (아래 -Y)
+}
+```
+
+####예제
+```javascript
+
+canvas.Stroke([
+  {
+    id: 'stroke',
+    points: [
+      [0, 100],
+      [100, 150],
+      [300, 70],
+      [400, 180],
+      [500, 100],
+      [600, 40]
+    ],
+    lineWidth : 1,
+    strokeStyle : 'gray',
+    lineCap : 'round',
+    lineJoin : 'round',
+    isClose : false,
+    isFill : false,
+    fillStyle : 'green',
+    opacity : 0.5,
+    gradient : {
+      type : 'linear',
+      start : [0 , 0],
+      end : [600 , 0],
+      colorPosition : [
+        [0 , 'blue'],
+        [0.25 , 'green'],
+        [0.5 , 'black'],
+        [0.75 , 'yellow'],
+        [1 , 'red']
+      ]
+    },
+    shadow : {
+        color : 'blue',
+        blur : 5,
+        offsetX : 3,
+        offsetY : 3
+      }
+  }
+]);
+canvas.Animation([
+  {
+    id: 'stroke',
+    type: 'stroking',
+    speed: 1,
+    time: 1
+  }
+])
+```
+
+
 ---
 #What Next
 
-1. Rectangle (updated 2016.07.13)
-2. Gradient
-3. Shadow
-4. Blur
+1. <del>Rectangle</del> (updated 2016.07.13)
+2. <del>Gradient(effect)</del> (updated 2016.07.15)
+3. <del>Shadow(effect)</del> (updated 2016.07.15)
+4. globalCompositeOperation
 5. Scale(animation)
 6. Rotate(animation)
-7. Image
+7. moving to specific points (animation)
+8. Image
+9. Performance
+10. Document in English
+11. Brushjs Experiment
 
 
 
