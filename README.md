@@ -77,6 +77,8 @@ var canvas = new Brush('canvas');
 **Effect**
 
 1. Gradient
+2. Shadow
+3. globalCompositeOperation
 
 <br/>
 ##1.기본 그래픽 (Non-Animation)
@@ -865,6 +867,36 @@ canvas.Animation([
 ])
 ```
 
+###3 . globalCompositeOperation
+-
+오브젝트가 겹치는 곳 합성처리 방식
+
+[이곳](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing)에서 자세한 정보를 확인해보시기 바랍니다.
+
+<img src="./Doc/globalcomposite.png" width="500">
+
+
+```javascript
+composite : 합성방법
+```
+
+####예제
+```javascript
+
+var ball = {
+  id : 'ballStatic',
+  points : [
+  	[10, 10 , 10]
+  ],
+  startAngle : 0,
+  endAngle : Math.PI*2,
+  isFill : true,
+  fillStyle : '#FDFD59',
+  opacity : 0.8,
+  composite : 'lighter',
+}
+
+```
 
 ---
 #What Next
@@ -872,7 +904,7 @@ canvas.Animation([
 1. <del>Rectangle</del> (updated 2016.07.13)
 2. <del>Gradient(effect)</del> (updated 2016.07.15)
 3. <del>Shadow(effect)</del> (updated 2016.07.15)
-4. globalCompositeOperation
+4. <del>globalCompositeOperation</del> (updated 2016.07.19)
 5. Scale(animation)
 6. Rotate(animation)
 7. moving to specific points (animation)

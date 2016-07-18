@@ -126,6 +126,8 @@ brushProto.drawingFn = {
 		context.shadowOffsetX = null;
 		context.shadowOffsetY = null;
 
+		context.globalCompositeOperation =  option.composite ? option.composite : 'source-over';
+
 		if(option.gradient){
 			var grad;
 			var gradient = option['gradient'],
@@ -138,7 +140,7 @@ brushProto.drawingFn = {
 				grad = context.createRadialGradient(start[0], Helper.fixCoordinate(option.height,start[1]), start[2] ,end[0], Helper.fixCoordinate(option.height,end[1]), end[2]);
 			}
 			colorPosition.forEach(function(elem){
-      	grad.addColorStop(elem[0],elem[1]);
+				grad.addColorStop(elem[0],elem[1]);
       })
 			_fillStyle = grad;
 			context.strokeStyle = grad;
@@ -147,9 +149,9 @@ brushProto.drawingFn = {
 		if(option.shadow){
 			var shadow = option['shadow'];
 			context.shadowColor = shadow['color'];
-			context.shadowBlur = shadow['blur'];
-			context.shadowOffsetX = shadow['offsetX'];
-			context.shadowOffsetY = -shadow['offsetY'];
+			context.shadowBlur = shadow['blur'] ? shadow['blur'] : 0;
+			context.shadowOffsetX = shadow['offsetX'] ? shadow['offsetX'] : 0;
+			context.shadowOffsetY = shadow['offsetY'] ? -shadow['offsetY'] : 0;
 		}
 
 
@@ -495,31 +497,6 @@ var AnimationType = {
 			}
 		})
 	},
-	// blowing: function(layer, animationInfo){
-	// 	var gradient, grdStart, grdEnd
-	// 	cavnas = layer['canvas'],
-	// 	option = animationInfo,
-	// 	points = layer['props']['points'],
-	// 	pointsLen = points.length;
-
-	// 	points.forEach(function(elem){
-	// 		if(elem[1] < 0){
-	// 			pointsLen--;
-	// 			if(pointsLen === 0){
-	// 				layer['props'] = brushProto.extend(true , {} , layer['propsOrigin']);
-	// 			}
-	// 		}
-	// 		elem[1] = elem[1] - option['speed'];
-
-	// 		if(layer['props']['gradient']){
-	// 			gradient = layer['props']['gradient'];
-	// 			grdStart = gradient['start'];
-	// 		 	grdEnd = gradient['end'];
-	// 		 	grdStart[1] =  grdStart[1] - option['speed'];
-	// 		 	grdEnd[1] =  grdEnd[1] - option['speed'];
-	// 		}
-	// 	})
-	// },
 	bouncing: function(layer, animationInfo){
 		var gradient, grdStart, grdEnd
 		cavnas = layer['canvas'],
@@ -560,10 +537,12 @@ var AnimationType = {
 		})
 	},
 	stroking: function(layer, animationInfo){
-		var option = layer['props'], points = option['points'], speed = animationInfo['speed'], drawPoints = [];
-		option['drawPoints'] = drawPoints;
-		var pointsLen = points.length;
-
+		var option = layer['props'],
+		points = option['points'],
+		speed = animationInfo['speed'],
+		drawPoints = [];
+		option['drawPoints'] = drawPoints,
+		pointsLen = points.length;
 
 		for(var pt =0; pt< pointsLen; pt++){
 			(function(){
@@ -586,7 +565,6 @@ var AnimationType = {
 			})(pt)
 		}
 	}
-
 }
 
 
