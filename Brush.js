@@ -32,6 +32,7 @@ var Group = {
 		option['width'] = canvas.width;
 		option['height'] = canvas.height;
 		this.layers[layerName] = {
+			group : canvas.group,
 			canvas : canvas,
 			type: type,
 			props : option,
@@ -55,6 +56,17 @@ var Group = {
 	},
 	get : function(name){
 		return Group._get(name)
+	},
+	destroy: function(name){
+		return Group._destroy(name)
+	},
+	_destroy: function(name){
+		if(this.layers[name]){
+			return delete this.layers[name]
+		}else{
+			return false;
+		}
+
 	}
 };
 
@@ -64,6 +76,7 @@ function _generateLayerName(){
 
 // Brush
 var Brush = function(canvas) {
+	this.group = canvas;
 	this.canvasElem = document.getElementById(canvas);
 	this.width = this.canvasElem.width;
 	this.height = this.canvasElem.height;
@@ -71,15 +84,9 @@ var Brush = function(canvas) {
 }
 var brushProto = Brush.prototype = {};
 
-brushProto.Clear = function(layer){
-	var cavnas = layer['canvas'];
-	var	context = cavnas['context'];
-	context.clearRect(0,0, canvas.width, canvas.height)
-}
-
 brushProto.init = function(cavnas,option, type){
 	Group.set( cavnas, option, type , false);
-	drawing();
+	drawing(cavnas.group);
 }
 
 brushProto.Text =  function(option){
@@ -162,7 +169,6 @@ brushProto.drawingFn = {
 		_context = _canvas.context,
 		option = layer['props'],
 		points = option['points'];
-
 		this.commonDrawing(_context , option);
 		points.forEach(function(elem){
 			_context.beginPath();
@@ -307,12 +313,18 @@ brushProto.drawingFn = {
 		_context.stroke();
 	},
 	stroke: function(layer){
-		var _canvas = layer['canvas'], _context = _canvas.context, option = layer['props'], points = option['drawPoints'], pointsLen = points.length, index = 0;
+		var _canvas = layer['canvas'],
+		_context = _canvas.context,
+		option = layer['props'],
+		points = option['drawPoints'],
+		pointsLen = points.length,
+		index = 0,
+		layerID = option['id'];
+
 		if(option['index']){
 			index = option['index'];
 		}else{
 			option['index'] = 0;
-
 		}
 
 		var startX = option['points'][0][0];
@@ -324,14 +336,49 @@ brushProto.drawingFn = {
 		for(var step =0; step <= index; step++){
 			_context.lineTo(points[step][0] , Helper.fixCoordinate(_canvas.height, points[step][1])  );
 		}
-		//
 		option['index'] = option['index'] + 1;
 
 		_context.stroke();
 		if(option['index'] === pointsLen){
-			option['index'] =0;
-		}
+			var animationInfo = AnimationGroup.get(layerID);
+			if(animationInfo && animationInfo['time']){
+				if(animationInfo['time'] === -1){
+					option['index'] = 0;
+				}else{
+					animationInfo['time'] = animationInfo['time'] - 1;
+					if(animationInfo['time'] === 0){
+						option['index'] =pointsLen-1;
+						AnimationGroup.destroy(layerID);
+					}else{
+						option['index'] = 0;
+					}
+				}
 
+			}else{
+				option['index'] =pointsLen-1;
+				AnimationGroup.destroy(layerID);
+			}
+
+			// var animationInfo = AnimationGroup.get(layerID);
+			// console.log(animationInfo)
+			// if(animationInfo && animationInfo['time']){
+			// 	animationInfo['time'] = animationInfo['time'] - 1;
+			// }
+
+			// if(animationInfo['time'] && animationInfo['time'] === 0){
+			// 	option['index'] =pointsLen-1;
+			// 	AnimationGroup.destroy(layerID);
+			// }
+
+
+			// if(animationInfo && animationInfo['time'] && animationInfo['time'] > 1){
+			// 	animationInfo['time'] = animationInfo['time'] - 1;
+			// 	option['index'] = 0;
+			// }
+			// else{
+			// 	option['index'] =pointsLen-1;
+			// }
+		}
 	}
 }
 
@@ -343,43 +390,46 @@ brushProto.Stroke =  function(option){
 	return canvas;
 }
 
-function drawing(){
+function drawing(group){
 	var layers = Group.get();
 	for(var key in layers){
 		(function(){
 			var _layer = layers[key];
-			switch(_layer['type']){
-				case 'text':
-					brushProto.drawingFn.text(_layer);
-					break;
-				case 'circle':
-					brushProto.drawingFn.circle(_layer);
-					break;
-				case 'line':
-					brushProto.drawingFn.line(_layer);
-					break;
-				case 'arcto':
-					brushProto.drawingFn.arcto(_layer);
-					break;
-				case 'bezier':
-					brushProto.drawingFn.bezierCurve(_layer);
-					break;
-				case 'quadratic':
-					brushProto.drawingFn.quadraticCurve(_layer);
-					break;
-				case 'rectangle':
-					brushProto.drawingFn.rectangle(_layer);
-					break;
-				case 'stroke':
-					if(arguments[1] === 'animate'){
-						brushProto.drawingFn.stroke(_layer);
-					}
-					break;
-				default:
-					return;
+			if(_layer.group === group){
+				switch(_layer['type']){
+					case 'text':
+						brushProto.drawingFn.text(_layer);
+						break;
+					case 'circle':
+						brushProto.drawingFn.circle(_layer);
+						break;
+					case 'line':
+						brushProto.drawingFn.line(_layer);
+						break;
+					case 'arcto':
+						brushProto.drawingFn.arcto(_layer);
+						break;
+					case 'bezier':
+						brushProto.drawingFn.bezierCurve(_layer);
+						break;
+					case 'quadratic':
+						brushProto.drawingFn.quadraticCurve(_layer);
+						break;
+					case 'rectangle':
+						brushProto.drawingFn.rectangle(_layer);
+						break;
+					case 'stroke':
+						if(arguments[2] === 'animate'){
+							brushProto.drawingFn.stroke(_layer);
+						}
+						break;
+					default:
+						return;
+				}
 			}
+		})(key , group, arguments[1])
 
-		})(key, arguments[0])
+		//})(key, arguments[0])
 
 
 	}
@@ -391,21 +441,39 @@ var AnimationGroup = {
 	set : function(info){
 		this.layers.push(info);
 	},
+	all : function(){
+		return this.layers;
+	},
 	get : function(name){
-		if(this.layers[name]){
-			return this.layers[name];
-		}else{
-			return this.layers;
-		}
+		var animateArr = this.layers;
+		var filtered =  animateArr.filter(function(animate){
+			return animate.id === name
+		})
+		return filtered[0];
+
+	},
+	destroy: function(name){
+		var animateArr = this.layers;
+		animateArr.forEach(function(elem, idx){
+			if(elem['id'] === name){
+				animateArr.splice(idx,1);
+			}
+		})
 	}
 };
-brushProto.clear =  function(){
+brushProto.clear =  function(grp){
 	var layers = Group.get();
+
 	for(var key in layers){
 		(function(key){
 			var canvas = layers[key]['canvas'];
 			var context = canvas.context;
-			context.clearRect(0, 0, canvas.width, canvas.height);
+
+			if(canvas.group === grp){
+				context.clearRect(0, 0, canvas.width, canvas.height);
+			}
+
+
 		})(key)
 	}
 }
@@ -421,23 +489,27 @@ brushProto.Animation = function(info){
 }
 
 function _Animation(){
-
-	AnimationGroup.get().forEach(function(elm){
+	var animateList = [];
+	AnimationGroup.all().forEach(function(elm){
 		var _id = elm['id'], type = elm['type'], layer = Group.get(_id);
 		AnimationType[type](layer, elm);
-
+		if(animateList.indexOf(layer['group']) === -1){
+			animateList.push(layer['group'])
+		}
 	})
-	brushProto.clear()
-	drawing('animate');
+	animateList.forEach(function(grp){
+		brushProto.clear(grp);
+		drawing(grp, 'animate');
+	})
 	window.requestAnimationFrame(_Animation)
-	//setTimeout(_Animation, 1000);
+	//setTimeout(_Animation, 2000);
 }
 
 var AnimationType = {
 	falling: function(layer, animationInfo){
 
 		var gradient, grdStart, grdEnd
-		cavnas = layer['canvas'],
+		canvas = layer['canvas'],
 		option = animationInfo,
 		points = layer['props']['points'],
 		pointsLen = points.length;
@@ -469,7 +541,7 @@ var AnimationType = {
 	},
 	rising: function(layer, animationInfo){
 		var gradient, grdStart, grdEnd
-		cavnas = layer['canvas'],
+		canvas = layer['canvas'],
 		option = animationInfo,
 		points = layer['props']['points'],
 		pointsLen = points.length;
@@ -498,12 +570,11 @@ var AnimationType = {
 		})
 	},
 	bouncing: function(layer, animationInfo){
-		var gradient, grdStart, grdEnd
-		cavnas = layer['canvas'],
+		var gradient, grdStart, grdEnd,
+		canvas = layer['canvas'],
 		option = animationInfo,
 		points = layer['props']['points'],
 		pointsLen = points.length;
-
 		points.forEach(function(elem){
 			elem[0] = elem[0] + option['speedX'];
 			elem[1] = elem[1] + option['speedY'];
@@ -543,7 +614,6 @@ var AnimationType = {
 		drawPoints = [];
 		option['drawPoints'] = drawPoints,
 		pointsLen = points.length;
-
 		for(var pt =0; pt< pointsLen; pt++){
 			(function(){
 				var currentP = points[pt], nextP = points[pt + 1];
