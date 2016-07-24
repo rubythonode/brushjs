@@ -339,12 +339,23 @@ brushProto.drawingFn = {
 
 		var startX = option['points'][0][0];
 		var startY = option['points'][0][1];
-
 		this.commonDrawing(_context , option);
 		_context.beginPath();
 		_context.moveTo(startX , Helper.fixCoordinate(_canvas.height, startY) );
 		for(var step =0; step <= index; step++){
-			_context.lineTo(points[step][0] , Helper.fixCoordinate(_canvas.height, points[step][1])  );
+			(function(){
+				var p1 = points[step];
+				var p2 = points[step+1];
+				if(p2){
+					var mid = Helper.midPointBtw(p1, p2);
+					_context.quadraticCurveTo(p1[0] ,Helper.fixCoordinate(_canvas.height, p1[1]) ,mid['x'],Helper.fixCoordinate(_canvas.height, mid['y']));
+				}
+
+
+			})(step)
+			//_context.lineTo(points[step][0] , Helper.fixCoordinate(_canvas.height, points[step][1])  );
+
+
 		}
 		option['index'] = option['index'] + 1;
 
@@ -607,9 +618,16 @@ var AnimationType = {
 		for(var pt =0; pt< pointsLen; pt++){
 			(function(){
 				var currentP = points[pt], nextP = points[pt + 1];
-				if(nextP){
-					var currentPX = currentP[0], currentPY = currentP[1], nextPX = nextP[0], nextPY = nextP[1], stepX, stepY, rangeX;
+				if(pt === 0){
+					drawPoints.push(currentP)
+				}
 
+				if(nextP){
+					var stepX, stepY, rangeX,
+					currentPX = currentP[0],
+					currentPY = currentP[1],
+					nextPX = nextP[0],
+					nextPY = nextP[1];
 					for(var rx = currentPX+ speed; rx <= nextPX; rx= rx + speed){
 						stepX = rx;
 						stepY = ((nextPY -currentPY) * (stepX- currentPX) / (nextPX - currentPX) ) + currentPY;
@@ -736,5 +754,11 @@ var Helper = brushProto.helper = {
 	isArray: Array.isArray,
 	fixCoordinate : function(ch, h){
 		return ch - h;
+	},
+	midPointBtw : function(p1, p2){
+		return {
+	    x: p1[0] + (p2[0] - p1[0]) / 2,
+	    y: p1[1] + (p2[1] - p1[1]) / 2
+	  };
 	}
 }
