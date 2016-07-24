@@ -1,9 +1,9 @@
 #Brushjs 
 
 
-버전 : beta-0.0.1
+#둘러보기
 
-
+**[Brushjs Gallery](yuby.github.io/brushjs/)**
 
 #시작하기
 
@@ -73,6 +73,7 @@ var canvas = new Brush('canvas');
 2. rising
 3. bouncing
 4. stroking
+5. opacity
 
 **Effect**
 
@@ -683,6 +684,52 @@ canvas.Animation([
 
 ```
 
+###5. opacity
+-
+투명도 변화 에니메이션
+
+```javascript
+
+canvas.Animation([
+  {
+    id : 효과를 줄 대상 레이어 고유 ID,
+    type: 'opacity',
+    opacity : '최종적으로 화면에 보이고 싶은 투명도(default : 0)' (int)
+    speed: 선을 긋는 속도(int)
+  }
+])
+
+```
+
+####예제
+```javascript
+
+canvas.Text(
+  [
+    {
+      id : 'text1',
+      font : '38pt Arial',
+      fillStyle : 'red',
+      lineWidth : 1,
+      //strokeStyle : 'blue',
+      text : 'Hello World',
+      textAlign : 'center',
+      textBaseline : 'middle',
+      points : [
+        [300 , 300]
+      ],
+      opacity:0
+    }
+  ]
+)
+canvas.Animation([{
+  id : 'text1',
+  type : 'opacity',
+  opacity : 1,
+  speed : 0.008
+}])
+
+```
 
 ##3.효과 (Effect)
 
@@ -911,7 +958,7 @@ var ball = {
 8. Image
 9. Performance
 10. Document in English
-11. Brushjs Experiment
+11. [Brushjs Gallery](yuby.github.io/brushjs/) (updating)
 
 
 

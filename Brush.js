@@ -124,9 +124,19 @@ brushProto.drawingFn = {
 		var _fillStyle = option.fillStyle ? option.fillStyle : '#000';
 		context.strokeStyle =  option.strokeStyle ? option.strokeStyle : '#000';
 		context.lineWidth = option.lineWidth ? option.lineWidth : 1;
-		context.globalAlpha = option.opacity ? option.opacity : 1;
 		context.lineCap = option.lineCap ? option.lineCap : 'butt';
 		context.lineJoin = option.lineJoin ? option.lineJoin : 'bevel';
+
+		if(option.opacity){
+			context.globalAlpha = option.opacity;
+		}else{
+			if(option.opacity === 0){
+				context.globalAlpha = 0;
+			}else{
+				context.globalAlpha = 1;
+			}
+
+		}
 
 		context.shadowColor = null;
 		context.shadowBlur = null;
@@ -358,26 +368,6 @@ brushProto.drawingFn = {
 				option['index'] =pointsLen-1;
 				AnimationGroup.destroy(layerID);
 			}
-
-			// var animationInfo = AnimationGroup.get(layerID);
-			// console.log(animationInfo)
-			// if(animationInfo && animationInfo['time']){
-			// 	animationInfo['time'] = animationInfo['time'] - 1;
-			// }
-
-			// if(animationInfo['time'] && animationInfo['time'] === 0){
-			// 	option['index'] =pointsLen-1;
-			// 	AnimationGroup.destroy(layerID);
-			// }
-
-
-			// if(animationInfo && animationInfo['time'] && animationInfo['time'] > 1){
-			// 	animationInfo['time'] = animationInfo['time'] - 1;
-			// 	option['index'] = 0;
-			// }
-			// else{
-			// 	option['index'] =pointsLen-1;
-			// }
 		}
 	}
 }
@@ -634,7 +624,30 @@ var AnimationType = {
 
 			})(pt)
 		}
-	}
+	},
+	opacity: function(layer, animationInfo){
+		var layerID,
+    canvas = layer['canvas'],
+    option = layer['props'],
+    AnimationOption = animationInfo,
+    maxOpacity = AnimationOption['opacity'] ? AnimationOption['opacity'] :1;
+    layerID = option['id'];
+
+    if(option['opacity'] > maxOpacity){
+      option['opacity'] = 	maxOpacity;
+
+      AnimationGroup.destroy(layerID);
+    }else{
+    	if(option['opacity'] + AnimationOption['speed'] > 1){
+    		option['opacity'] = maxOpacity;
+    		AnimationGroup.destroy(layerID);
+    	}else{
+    		option['opacity'] = option['opacity'] + AnimationOption['speed'];
+    	}
+
+    }
+
+  }
 }
 
 
