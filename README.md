@@ -3,7 +3,7 @@
 
 # 둘러보기
 
-**[Brushjs Gallery](yuby.github.io/brushjs/)**
+**[Brushjs Gallery](http://yuby.github.io/brushjs/)**
 
 # 시작하기
 
